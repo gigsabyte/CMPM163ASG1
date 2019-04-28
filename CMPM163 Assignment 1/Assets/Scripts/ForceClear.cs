@@ -11,9 +11,9 @@ public class ForceClear : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void OnPreRender()
     {
         // why the fuck do i have to do this.
-        GL.ClearWithSkybox(false, gameObject.GetComponent<Camera>());
+        GL.Clear(false, true, Color.clear);
     }
 }

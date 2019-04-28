@@ -12,8 +12,8 @@
     {
         Pass
         {
-			Tags { "LightMode" = "ForwardAdd"}
-			Blend One One
+			Tags { "LightMode" = "ForwardAdd" "RenderType" = "Opaque"}
+			//Blend SrcAlpha SrcAlpha
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -82,7 +82,7 @@
                 
                 
                 float3 finalColor = ambientComponent + diffuseComponent + specularComponent;
-                return float4(finalColor, 1.0);
+                return float4(finalColor, 0.4);
             }
             ENDCG
         }

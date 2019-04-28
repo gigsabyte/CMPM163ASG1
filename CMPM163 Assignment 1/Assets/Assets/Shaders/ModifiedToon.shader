@@ -12,11 +12,10 @@ Shader "Custom/ModifiedToon"
     
     SubShader
     {
+		Tags { "LightMode" = "ForwardAdd" "RenderType"="Opaque"}
+        
         Pass {
-            Tags { "LightMode" = "ForwardAdd" } //Important! In Unity, point lights are calculated in the the ForwardAdd pass
-            //Blend One One //Turn on additive blending if you have more than one point light
-          
-            
+            Blend SrcAlpha SrcAlpha
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -129,7 +128,7 @@ Shader "Custom/ModifiedToon"
                 float3 specular = Ks * Kl * specularVal;
                 
                 //FINAL COLOR OF FRAGMENT
-                return float4(ambient + diffuse + specular, 1.0);
+                return float4(ambient + diffuse + specular, 0.4);
                 
 
             }
