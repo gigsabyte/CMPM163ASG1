@@ -16,6 +16,12 @@ Shader "CM163/PhongTexture"
         Pass 
         {
 			Tags { "LightMode" = "ForwardAdd"}
+			Stencil {
+		        Ref 2
+		        Comp NotEqual
+		        Pass Replace
+		    }
+			Blend One One
 			
             CGPROGRAM
             #pragma vertex vert
