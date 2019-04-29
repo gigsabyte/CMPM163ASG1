@@ -12,9 +12,8 @@ public class CellAutomata : MonoBehaviour
     // textures
     Texture2D texA;
     Texture2D texB;
-    Texture2D inputTex;
-    Texture2D outputTex;
     RenderTexture rt1;
+    RenderTexture rt2;
 
     // shaders
     Shader cellularAutomataShader;
@@ -46,8 +45,8 @@ public class CellAutomata : MonoBehaviour
         }
 
         // we're making a 128px square texture because bigger sizes take too long
-        width = 128;
-        height = 128;
+        width = 256;
+        height = 256;
 
         texA = new Texture2D(width, height, TextureFormat.RGBA32, false);
         texB = new Texture2D(width, height, TextureFormat.RGBA32, false);
@@ -55,7 +54,7 @@ public class CellAutomata : MonoBehaviour
         texA.filterMode = FilterMode.Point;
         texB.filterMode = FilterMode.Point;
 
-        float colorStep = 1.0f / 4;
+        float colorStep = 1.0f / 3;
         float rand = Random.Range(0.0f, 1.0f);        
 
         // populate our texture with random pixels
@@ -83,10 +82,16 @@ public class CellAutomata : MonoBehaviour
 
         texA.Apply(); //copy changes to the GPU
 
-        // make a render texture
+
         rt1 = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+        rt2 = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+        rt1.filterMode = FilterMode.Point;
+        rt2.filterMode = FilterMode.Point;
 
         ouputTextureShader = Shader.Find("Custom/OutputTexture"); // get the outputtexture shader
+
+        Graphics.Blit(texA, rt1, rend.material);
+        Graphics.Blit(texB, rt2, rend.material);
     }
 
     // Update is called once per frame
@@ -101,30 +106,21 @@ public class CellAutomata : MonoBehaviour
         rend.material.SetColor("_Color1", colors[1]);
         rend.material.SetColor("_Color2", colors[2]);
 
-        // run the cell automata shader every other frame
         if (count % 2 == 0)
         {
-            inputTex = texA;
-            outputTex = texB;
+            rend.material.SetTexture("_MainTex", rt1);
+            Graphics.Blit(rt1, rt2, rend.material);
+            rend.material.shader = ouputTextureShader;
+            rend.material.SetTexture("_MainTex", rt2);
         }
         else
         {
-            inputTex = texB;
-            outputTex = texA;
+            rend.material.SetTexture("_MainTex", rt2);
+            Graphics.Blit(rt2, rt1, rend.material);
+            rend.material.shader = ouputTextureShader;
+            rend.material.SetTexture("_MainTex", rt1);
+
         }
-
-
-        rend.material.SetTexture("_MainTex", inputTex);
-
-        //source, destination, material
-        Graphics.Blit(inputTex, rt1, rend.material);
-        Graphics.CopyTexture(rt1, outputTex);
-
-
-        //set the active shader to be a regular shader that maps the current
-        //output texture onto a game object
-        rend.material.shader = ouputTextureShader;
-        rend.material.SetTexture("_MainTex", outputTex);
 
 
         count++;
